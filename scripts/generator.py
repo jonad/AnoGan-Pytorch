@@ -22,6 +22,14 @@ class Generator(nn.Module):
         out = F.relu(self.convT4(out), inplace=True)
         return F.tanh(self.output(out))
     
+    
+def train_generator(discriminator, data, label, criterion):
+    output = discriminator(data).view(-1)
+    error = criterion(output, label)
+    error.backward()
+    return error
+    
+    
 if __name__ == '__main__':
     
     netG = Generator(ngpu).to(device)

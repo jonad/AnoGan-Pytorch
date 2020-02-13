@@ -21,6 +21,15 @@ class Discriminator(nn.Module):
         out = F.leaky_relu(self.conv4(out), inplace=True)
         return F.sigmoid(self.output(out)), out.view(-1)
     
+def train_discriminator(data, label,  discriminator, criterion, device):
+    real_data = data[0].to(device)
+    output = discriminator(real_data).view(-1)
+    error = criterion(output, label)
+    error.backward()
+    return error
+    
+    
+    
 if __name__ == '__main__':
     netD = Discriminator(ngpu).to(device)
     print(netD)
