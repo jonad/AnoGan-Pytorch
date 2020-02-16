@@ -9,5 +9,6 @@ ngpu = 1
 beta1 = 0.5
 num_epochs = 5
 learning_rate=0.0002
+batch_size = 64
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 T_co = TypeVar('T_co', covariant=True)

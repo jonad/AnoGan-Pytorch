@@ -1,4 +1,5 @@
 from torch import nn
+import os
 import torch
 def weights_init(model):
     classname = model.__class__.__name__
@@ -28,4 +29,12 @@ def deconv(in_channels, out_channels, kernel_size, stride=2, padding=1, batch_no
     if batch_norm:
         layers.append(nn.BatchNorm2d(out_channels))
     return nn.Sequential(*layers)
-    
+
+def create_dir(directory):
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+        
+def get_noise_sampler():
+    return lambda m, n: torch.rand(m, n, 1, 1).requires_grad_()
+
+noise_data = get_noise_sampler()
