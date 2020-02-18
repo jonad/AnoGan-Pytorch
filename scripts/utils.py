@@ -1,6 +1,7 @@
 from torch import nn
 import os
 import torch
+from .config import  *
 def weights_init(model):
     classname = model.__class__.__name__
     if classname.find('Conv') != -1:
@@ -33,7 +34,13 @@ def deconv(in_channels, out_channels, kernel_size, stride=2, padding=1, batch_no
 def create_dir(directory):
     if not os.path.exists(directory):
         os.makedirs(directory)
-        
+ 
+def checkpoint(generator, discriminator):
+  generator_path = os.path.join(MODEL_FOLDER, 'generator.pkl')
+  discriminator_path = os.path.join(MODEL_FOLDER, 'discriminator.pkl')
+  torch.save(generator.state_dict(), generator_path)
+  torch.save(discriminator.state_dict(), discriminator_path)
+  
 def get_noise_sampler():
     return lambda m, n: torch.rand(m, n, 1, 1).requires_grad_()
 

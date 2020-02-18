@@ -14,7 +14,7 @@ class Discriminator(nn.Module):
         self.conv4 = conv(n_discriminator_feature_map*4, n_discriminator_feature_map*8, 4, 2, 1)
         self.output = conv(n_discriminator_feature_map*8, 1, 4, 1, 0, batch_norm=False)
         
-    def forward(self, *input: Any, **kwargs: Any) -> T_co:
+    def forward(self, input):
         out = F.leaky_relu(self.conv1(input), inplace=True)
         out = F.leaky_relu(self.conv2(out), inplace=True)
         out = F.leaky_relu(self.conv3(out), inplace=True)
@@ -26,12 +26,20 @@ def train_discriminator(data, label,  discriminator, criterion, device):
     output = discriminator(real_data).view(-1)
     error = criterion(output, label)
     error.backward()
-    return error
-    
-    
+    return error, output.mean().item()
+
+ # Create the discriminator
+discriminator_network = Discriminator(ngpu).to(device)
+
+# Handle multi-gpu if desired
+if (device.type == 'cuda') and (ngpu > 1):
+    discriminator_network = nn.DataParallel(discriminator_network, list(range(ngpu)))
+
+# Apply the weights_init function to randomly initialize all weights
+
+discriminator_network.apply(weights_init)
     
 if __name__ == '__main__':
-    netD = Discriminator(ngpu).to(device)
-    print(netD)
+    print(discriminator_network)
     
     

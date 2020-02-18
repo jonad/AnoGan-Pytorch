@@ -15,7 +15,7 @@ class Generator(nn.Module):
         self.convT4 = deconv(n_generator_feature_map*2, n_generator_feature_map, 4, 2, 1)
         self.output = deconv(n_generator_feature_map, n_channels, 4, 2, 1, batch_norm=False)
         
-    def forward(self, *input: Any, **kwargs: Any) -> T_co:
+    def forward(self, input):
         out = F.relu(self.convT1(input), inplace=True)
         out = F.relu(self.convT2(out), inplace=True)
         out = F.relu(self.convT3(out), inplace=True)
@@ -27,13 +27,19 @@ def train_generator(discriminator, data, label, criterion):
     output = discriminator(data).view(-1)
     error = criterion(output, label)
     error.backward()
-    return error
-    
-    
+    return error, output.mean().item()
+
+# create the generator
+generator_network = Generator(ngpu).to(device)
+
+# Handle multi-gpu
+if (device.type == 'cuda') and (ngpu > 1):
+    generator_network = nn.DataParallel(generator_network, list(range(ngpu)))
+
+generator_network.apply(weights_init)
+
 if __name__ == '__main__':
-    
-    netG = Generator(ngpu).to(device)
-    print(netG)
+    print(generator_network)
 
         
         
